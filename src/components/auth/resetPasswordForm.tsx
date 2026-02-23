@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SubmitButton } from "../ui/submitButton";
+import { AuthModal } from "../ui/authModal";
 
 // ─── Reusable: PasswordInput ──────────────────────────────────────────────────
 
@@ -128,6 +130,8 @@ export function ResetPasswordForm() {
 
   const [errors, setErrors] = useState<ResetPasswordFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigate = useNavigate();
 
   const validate = (): boolean => {
     const newErrors: ResetPasswordFormErrors = {};
@@ -162,6 +166,9 @@ export function ResetPasswordForm() {
     // TODO: wire to API
     await new Promise((r) => setTimeout(r, 1500));
     setIsLoading(false);
+
+    // Show success modal instead of direct navigation
+    setShowSuccessModal(true);
   };
 
   return (
@@ -194,9 +201,17 @@ export function ResetPasswordForm() {
             error={errors.confirmPassword}
           />
 
-          <SubmitButton label="Save New Password" isLoading={isLoading} loadingLabel="Saving New Password ..."/>
+          <SubmitButton label="Save New Password" isLoading={isLoading} loadingLabel="Saving New Password ..." />
         </form>
       </div>
+
+      <AuthModal
+        isOpen={showSuccessModal}
+        title="Password Updated!"
+        description="You have successfully updated your password"
+        buttonText="Proceed To Sign In"
+        onAction={() => navigate("/login")}
+      />
     </div>
   );
 }

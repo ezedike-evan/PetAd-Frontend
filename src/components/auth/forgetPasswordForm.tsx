@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FormInput } from "../ui/formInput";
 import { SubmitButton } from "../ui/submitButton";
 
@@ -20,13 +21,40 @@ export function ForgetPasswordForm() {
   });
 
   const [errors, setErrors] = useState<ForgetPasswordFormErrors>({});
-  const [isLoading, _setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const validate = (): boolean => {
+    const newErrors: ForgetPasswordFormErrors = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (field: keyof ForgetPasswordFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof ForgetPasswordFormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise((r) => setTimeout(r, 1000));
+    setIsLoading(false);
+
+    // Navigate to reset password page since everything is mock right now
+    navigate("/reset");
   };
 
   return (
@@ -37,6 +65,7 @@ export function ForgetPasswordForm() {
 
       <div className="flex flex-col gap-5">
         <form
+          onSubmit={handleSubmit}
           noValidate
           className="flex flex-col gap-4"
         >
@@ -60,7 +89,7 @@ export function ForgetPasswordForm() {
             href="/login"
             className="font-semibold text-[#E84D2A] hover:underline"
           >
-            Sign In        
+            Sign In
           </a>
         </p>
       </div>
